@@ -19,6 +19,8 @@ class User extends Authenticatable
 
     protected static $validationRules = [];
 
+    protected static $sUserModelClass;
+
     protected $table = 'users';
 
     /**
@@ -52,21 +54,33 @@ class User extends Authenticatable
         parent::__construct($attributes);
     }
 
+    public function meta() {
+        if (is_null(static::$sUserModelClass)) {
+            static::$sUserModelClass = Config::get('popcode-usercrud.meta_model', 'Popcode\\UserCrud\\Models\\UserMeta');
+        }
+        return $this->hasOne(static::$sUserModelClass);
+    }
+
+    public function metas() {
+        if (is_null(static::$sUserModelClass)) {
+            static::$sUserModelClass = Config::get('popcode-usercrud.meta_model', 'Popcode\\UserCrud\\Models\\UserMeta');
+        }
+        return $this->hasMany(static::$sUserModelClass);
+    }
 
     /**
      * Perform the actual delete query on this model instance.
      *
      * @return bool
      */
-    protected function runSoftDelete()
-    {
+    protected function runSoftDelete() {
         $query = $this->newQueryWithoutScopes()->where($this->getKeyName(), $this->getKey());
 
         $this->{$this->getDeletedAtColumn()} = $time = $this->freshTimestamp();
 
         return $query->update([
             $this->getDeletedAtColumn() => $this->fromDateTime($time),
-            $this->email => $this->email . '#deleted-' . $this->id
+            $this->email                => $this->email . '#deleted-' . $this->id,
         ]);
     }
 
@@ -75,8 +89,7 @@ class User extends Authenticatable
      *
      * @return bool|null
      */
-    public function restore()
-    {
+    public function restore() {
         // If the restoring event does not return false, we will proceed with this
         // restore operation. Otherwise, we bail out so the developer will stop
         // the restore totally. We will clear the deleted timestamp and save.
@@ -128,6 +141,7 @@ class User extends Authenticatable
 
     /**
      * @param mixed $data
+     * @param string $type
      *
      * @return \Illuminate\Validation\Validator
      */
@@ -142,7 +156,7 @@ class User extends Authenticatable
     }
 
     public static function registerRestoreGuard() {
-        static::registerModelEvent('restoring', function($user) {
+        static::registerModelEvent('restoring', function ($user) {
             $email = substr($user->email, 0, strpos($user->email, '#'));
             return static::where('email', '=', $email)->count() === 0;
         });
