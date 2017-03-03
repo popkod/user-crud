@@ -8,6 +8,9 @@ use PopCode\UserCrud\Interfaces\UserControllerInterface;
 class UserController extends BaseController implements UserControllerInterface
 {
 
+    /**
+     * @var \Illuminate\Database\Eloquent\Model|\PopCode\UserCrud\Models\User
+     */
     protected $model;
 
     public function __construct($model = null) {
@@ -15,6 +18,11 @@ class UserController extends BaseController implements UserControllerInterface
             $this->model = $model;
         } else {
             $this->model = \Config::get('popcode-usercrud.model', \PopCode\UserCrud\Models\User::class);
+        }
+
+        if (is_string($this->model)) {
+            $modelClassName = $this->model;
+            $this->model = new $modelClassName;
         }
     }
 
@@ -78,22 +86,17 @@ class UserController extends BaseController implements UserControllerInterface
 
 
     protected function indexUsers() {
-        /* @var \Illuminate\Database\Eloquent\Model|\PopCode\UserCrud\Models\User $model */
-        $model = new $this->model;
-        return $model->all();
+        return $this->model->all();
     }
 
     protected function showUser($id) {
-        /* @var \Illuminate\Database\Eloquent\Model|\PopCode\UserCrud\Models\User $model */
-        $model = new $this->model;
-        $user = $model->find($id);
+        $user = $this->model->where('id', '=', $id)->first();
         return $user;
     }
 
     protected function storeUser($userData) {
         /* @var \PopCode\UserCrud\Models\User $user */
-        $user = new $this->model;
-        $user->fill($userData);
+        $user = $this->model->newInstance($userData);
         $user->save();
 
         return $user;
@@ -101,8 +104,7 @@ class UserController extends BaseController implements UserControllerInterface
 
     protected function updateUser($id, $userData) {
         /* @var \PopCode\UserCrud\Models\User $user */
-        $user = new $this->model;
-        $user = $user->find($id);
+        $user = $this->model->where('id', '=', $id)->first();
 
         $user->fill($userData);
         $user->save();
@@ -111,18 +113,14 @@ class UserController extends BaseController implements UserControllerInterface
     }
 
     protected function destroyUser($id) {
-        /* @var \Illuminate\Database\Eloquent\Model|\PopCode\UserCrud\Models\User $model */
-        $model = new $this->model;
         /* @var \PopCode\UserCrud\Models\User $user */
-        $user = $model->find($id);
+        $user = $this->model->where('id', '=', $id)->first();
         return $user->delete() === true;
     }
 
 
     protected function hasError($userData, $type = null) {
-        /* @var \Illuminate\Database\Eloquent\Model|\PopCode\UserCrud\Models\User $model */
-        $model = new $this->model;
-        $validator = $model->validate($userData, $type);
+        $validator = $this->model->validate($userData, $type);
 
         if ($validator->fails()) {
             return $validator->messages();

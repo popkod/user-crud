@@ -9,15 +9,19 @@ use Carbon\Carbon;
 
 class UserCrudServiceProvider extends ServiceProvider
 {
+    protected $root;
 
     public function boot() {
 
         $root = __DIR__ . '/../../../';
 
         // enable create configuration
-        $this->publishes([
-            $root . 'config/popcode-usercrud.php' => config_path('popcode-usercrud.php'),
-        ], 'config');
+        $this->publishes(
+            [
+                $root . 'config/popcode-usercrud.php' => config_path('popcode-usercrud.php'),
+            ],
+            'config'
+        );
 
         if (Config::get('popcode-usercrud.register_default_routes')) {
             // register routes
