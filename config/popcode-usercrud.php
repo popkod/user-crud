@@ -39,4 +39,6 @@ return [
     'default_admin_metas' => [
         ['key' => 'created_by', 'value' => 'Core System'],
     ],
+
+    'role_controller' => PopCode\UserCrud\Controllers\RoleController::class,
 ];
