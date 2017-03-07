@@ -13,16 +13,36 @@ class UserController extends BaseController implements UserControllerInterface
      */
     protected $model;
 
-    public function __construct($model = null) {
+    /**
+     * @var bool|\Illuminate\Database\Eloquent\Model|\PopCode\UserCrud\Models\UserMeta
+     */
+    protected $metaModel = false;
+
+    public function __construct($model = null, $metaModel = null) {
         if ($model) {
             $this->model = $model;
         } else {
             $this->model = \Config::get('popcode-usercrud.model', \PopCode\UserCrud\Models\User::class);
         }
 
+        if (is_null($metaModel)) {
+            if (\Config::get('popcode-usercrud.user_meta', false)) {
+                $this->metaModel = \Config::get('popcode-usercrud.meta_model', \PopCode\UserCrud\Models\UserMeta::class);
+            } else {
+                $this->metaModel = false;
+            }
+        } else {
+            $this->metaModel = $metaModel;
+        }
+
         if (is_string($this->model)) {
             $modelClassName = $this->model;
             $this->model = new $modelClassName;
+        }
+
+        if (is_string($this->metaModel)) {
+            $modelClassName = $this->metaModel;
+            $this->metaModel = new $modelClassName;
         }
     }
 
@@ -86,11 +106,20 @@ class UserController extends BaseController implements UserControllerInterface
 
 
     protected function indexUsers() {
-        return $this->model->all();
+        if ($this->metaModel) {
+            $users = $this->model->with('metas')->all();
+        } else {
+            $users = $this->model->all();
+        }
+        return $users;
     }
 
     protected function showUser($id) {
-        $user = $this->model->where('id', '=', $id)->first();
+        if ($this->metaModel) {
+            $user = $this->model->with('metas')->where('id', '=', $id)->first();
+        } else {
+            $user = $this->model->where('id', '=', $id)->first();
+        }
         return $user;
     }
 
@@ -98,6 +127,13 @@ class UserController extends BaseController implements UserControllerInterface
         /* @var \PopCode\UserCrud\Models\User $user */
         $user = $this->model->newInstance($userData);
         $user->save();
+
+        if ($this->metaModel) {
+            array_walk($userData['metas'], function($metaData) {
+                $this->metaModel->newInstance($metaData)->save();
+            });
+            $user->load('metas');
+        }
 
         return $user;
     }
@@ -108,6 +144,14 @@ class UserController extends BaseController implements UserControllerInterface
 
         $user->fill($userData);
         $user->save();
+
+        if ($this->metaModel) {
+            $user->metas()->delete();
+            array_walk($userData['metas'], function($metaData) {
+                $this->metaModel->newInstance($metaData)->save();
+            });
+            $user->load('metas');
+        }
 
         return $user;
     }
@@ -120,10 +164,24 @@ class UserController extends BaseController implements UserControllerInterface
 
 
     protected function hasError($userData, $type = null) {
+        $errorMessages = [];
+
         $validator = $this->model->validate($userData, $type);
 
         if ($validator->fails()) {
-            return $validator->messages();
+            $errorMessages = $validator->messages()->toArray();
+        }
+
+        if ($this->metaModel) {
+            $metaValidator = $this->metaModel->validate($userData, $type);
+
+            if ($metaValidator->fails()) {
+                $errorMessages = array_merge($errorMessages, $metaValidator->messages()->toArray());
+            }
+        }
+
+        if (!empty($errorMessages)) {
+            return $errorMessages;
         }
 
         return false;

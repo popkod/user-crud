@@ -4,7 +4,7 @@ namespace PopCode\UserCrud\Models;
 
 use Config;
 use Validator;
-use Eloquent;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class UserMeta extends Eloquent
 {

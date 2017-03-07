@@ -25,7 +25,7 @@ class UserControllerTest extends TestCase
 
         $this->user->shouldInstantiated()->getAll($data);
 
-        $controller = new UserController($this->user->mock);
+        $controller = new UserController($this->user->mock, false);
 
         $response = $this->invokeMethod($controller, 'indexUsers');
 
@@ -45,9 +45,12 @@ class UserControllerTest extends TestCase
             ->andReturn(true);
         $this->user->mock
             ->shouldReceive('messages')
+            ->andReturnSelf();
+        $this->user->mock
+            ->shouldReceive('toArray')
             ->andReturn($data);
 
-        $controller = new UserController($this->user->mock);
+        $controller = new UserController($this->user->mock, false);
 
         $response = $this->invokeMethod($controller, 'hasError', ['userData', null]);
 
@@ -64,7 +67,7 @@ class UserControllerTest extends TestCase
             ->once()
             ->andReturn(false);
 
-        $controller = new UserController($this->user->mock);
+        $controller = new UserController($this->user->mock, false);
 
         $response = $this->invokeMethod($controller, 'hasError', ['userData', null]);
 
@@ -83,7 +86,7 @@ class UserControllerTest extends TestCase
             ->shouldReceive('save')
             ->once();
 
-        $controller = new UserController($this->user->mock);
+        $controller = new UserController($this->user->mock, false);
 
         $response = $this->invokeMethod($controller, 'storeUser', [$data]);
 
@@ -111,7 +114,7 @@ class UserControllerTest extends TestCase
             ->shouldReceive('save')
             ->once();
 
-        $controller = new UserController($this->user->mock);
+        $controller = new UserController($this->user->mock, false);
 
         $response = $this->invokeMethod($controller, 'updateUser', [$id, $data]);
 
@@ -133,7 +136,7 @@ class UserControllerTest extends TestCase
             ->shouldReceive('delete')
             ->andReturn(true);
 
-        $controller = new UserController($this->user->mock);
+        $controller = new UserController($this->user->mock, false);
 
         $response = $this->invokeMethod($controller, 'destroyUser', [$id]);
 
