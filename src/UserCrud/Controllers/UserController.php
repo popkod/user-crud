@@ -116,9 +116,9 @@ class UserController extends BaseController implements UserControllerInterface
 
     protected function showUser($id) {
         if ($this->metaModel) {
-            $user = $this->model->with('metas')->where('id', '=', $id)->get();
+            $user = $this->model->with('metas')->where('id', '=', $id)->first();
         } else {
-            $user = $this->model->where('id', '=', $id)->get();
+            $user = $this->model->where('id', '=', $id)->first();
         }
         return $user;
     }
