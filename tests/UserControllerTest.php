@@ -23,7 +23,12 @@ class UserControllerTest extends TestCase
     public function testIndex() {
         $data = 'asserted response';
 
-        $this->user->shouldInstantiated()->getAll($data);
+        $this->user->shouldInstantiated();
+
+        $this->user->mock
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn($data);
 
         $controller = new UserController($this->user->mock, false);
 

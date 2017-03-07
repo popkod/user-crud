@@ -34,10 +34,12 @@ class UserCrudServiceProvider extends ServiceProvider
             $this->publishes(
                 [
                     $root . 'migrations/2017_03_02_124652_add_soft_deletes_to_users.php' => database_path('migrations/' . $datePrefix . '_add_soft_deletes_to_users.php'),
+                    $root . 'migrations/2017_03_02_124652_add_role_to_users.php' => database_path('migrations/' . $datePrefix . '_add_role_to_users.php'),
                 ],
                 'migrations'
             );
         }
+
         // enable create migrations
         if (Config::get('popcode-usercrud.user_meta')) {
             if (!class_exists('CreateUserMetaTable')) {
@@ -50,6 +52,17 @@ class UserCrudServiceProvider extends ServiceProvider
             }
         }
 
+        if (!class_exists('PopcodeUserCrudCallFirstUserSeeder')) {
+            $fresherDatePrefix = Carbon::now()->addSeconds(1)->format('Y_m_d_His');
+            $this->publishes(
+                [
+                    $root . 'migrations/2017_03_02_124653_popcode_user_crud_call_first_user_seeder.php' => database_path('migrations/' . $fresherDatePrefix . '_popcode_user_crud_call_first_user_seeder.php'),
+                    $root . 'seeds/PopcodeUserCrudFirstUserSeeder.php'                                  => database_path('seeds/PopcodeUserCrudFirstUserSeeder.php'),
+                ],
+                'migrations'
+            );
+        }
+
         // merge configuration
         $this->mergeConfigFrom($root . 'config/popcode-usercrud.php', 'popcode-usercrud');
 
@@ -58,5 +71,6 @@ class UserCrudServiceProvider extends ServiceProvider
         if (method_exists($userClass, 'registerRestoreGuear')) {
             $userClass::registerRestoreGuard();
         }
+
     }
 }

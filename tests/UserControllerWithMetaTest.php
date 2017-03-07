@@ -26,12 +26,17 @@ class UserControllerWithMetaTest extends TestCase
         $data = 'asserted response';
 
         $this->user->shouldInstantiated();
+
         $this->user->mock
             ->shouldReceive('with')
             ->withArgs(['metas'])
             ->once()
             ->andReturnSelf();
-        $this->user->getAll($data);
+
+        $this->user->mock
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn($data);
 
         $controller = new UserController($this->user->mock, $this->metas->mock);
 

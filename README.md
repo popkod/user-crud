@@ -14,7 +14,6 @@ in the config file you can enable default routes (/api/users) on key "register_d
 you can enable user meta in the created popcode-usercrud.php file by set true value for key 'user_meta'
 after that you can create the migration file to the user_metas table by calling the command:
 - php artisan vendor:publish --provider="PopCode\UserCrud\Providers\UserCrudServiceProvider" --tag=migrations
+please run composer dump autoload after migrations are created to prevent any accidentally further creations and let the next command to run the default user seeder else it will be skipped but can be found in the main database/seeds folder
 - call 'php artisan migrate' to create the table
-
-please run composer dump autoload after migrations are created to prevent any accidentally further creations
 

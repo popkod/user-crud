@@ -26,4 +26,17 @@ return [
             'password' => 'required|confirmed',
         ],
     ],
+    'roles' => [
+        'registered' => 1,
+        'admin'      => 2,
+    ],
+    'default_admin' => [
+        'name'     => 'Default Admin',
+        'email'    => '',
+        'password' => 'initial',
+        'role'     => 2,
+    ],
+    'default_admin_metas' => [
+        ['key' => 'created_by', 'value' => 'Core System'],
+    ],
 ];
