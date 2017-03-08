@@ -4,6 +4,7 @@ namespace PopCode\UserCrud\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
 use PopCode\UserCrud\Interfaces\UserControllerInterface;
+use PopCode\UserCrud\Factories\UserMetaFactory;
 
 class UserController extends BaseController implements UserControllerInterface
 {
@@ -107,7 +108,7 @@ class UserController extends BaseController implements UserControllerInterface
 
     protected function indexUsers() {
         if ($this->metaModel) {
-            $users = $this->model->with('metas')->get();
+            $users = $this->model->with('meta')->get();
         } else {
             $users = $this->model->get();
         }
@@ -116,7 +117,7 @@ class UserController extends BaseController implements UserControllerInterface
 
     protected function showUser($id) {
         if ($this->metaModel) {
-            $user = $this->model->with('metas')->where('id', '=', $id)->first();
+            $user = $this->model->with('meta')->where('id', '=', $id)->first();
         } else {
             $user = $this->model->where('id', '=', $id)->first();
         }
@@ -129,10 +130,8 @@ class UserController extends BaseController implements UserControllerInterface
         $user->save();
 
         if ($this->metaModel) {
-            array_walk($userData['metas'], function($metaData) {
-                $this->metaModel->newInstance($metaData)->save();
-            });
-            $user->load('metas');
+            (new UserMetaFactory($this->metaModel, $user->id))->create($userData['meta'])->save();
+            $user->load('meta');
         }
 
         return $user;
@@ -146,11 +145,9 @@ class UserController extends BaseController implements UserControllerInterface
         $user->save();
 
         if ($this->metaModel) {
-            $user->metas()->delete();
-            array_walk($userData['metas'], function($metaData) {
-                $this->metaModel->newInstance($metaData)->save();
-            });
-            $user->load('metas');
+            $user->meta()->delete();
+            (new UserMetaFactory($this->metaModel, $user->id))->create($userData['meta'])->save();
+            $user->load('meta');
         }
 
         return $user;

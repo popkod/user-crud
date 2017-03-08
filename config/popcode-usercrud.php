@@ -20,9 +20,9 @@ return [
         'default' => [
             'name' => 'string|max:250',
             'email' => 'required|unique:users',
-            'password' => 'required',
+            'password' => 'confirmed',
         ],
-        'create' => [
+        'store' => [
             'password' => 'required|confirmed',
         ],
     ],
@@ -41,4 +41,7 @@ return [
     ],
 
     'role_controller' => PopCode\UserCrud\Controllers\RoleController::class,
+
+    // string[] list of fields that always needs to be listed
+    'meta_fields' => [],
 ];

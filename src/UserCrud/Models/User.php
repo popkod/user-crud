@@ -17,9 +17,9 @@ class User extends Authenticatable
 
     protected static $sTable = null;
 
-    protected static $validationRules = [];
-
     protected static $sUserModelClass;
+
+    protected static $preprocessedMeta;
 
     protected $table = 'users';
 
@@ -50,18 +50,12 @@ class User extends Authenticatable
 
     public function __construct(array $attributes = []) {
         $this->initTableName()
-            ->initFillables();
+            ->initFillables()
+            ->initPreprocessedMeta();
         parent::__construct($attributes);
     }
 
     public function meta() {
-        if (is_null(static::$sUserModelClass)) {
-            static::$sUserModelClass = Config::get('popcode-usercrud.meta_model', 'Popcode\\UserCrud\\Models\\UserMeta');
-        }
-        return $this->hasOne(static::$sUserModelClass);
-    }
-
-    public function metas() {
         if (is_null(static::$sUserModelClass)) {
             static::$sUserModelClass = Config::get('popcode-usercrud.meta_model', 'Popcode\\UserCrud\\Models\\UserMeta');
         }
@@ -139,6 +133,17 @@ class User extends Authenticatable
         return $this;
     }
 
+    protected function initPreprocessedMeta() {
+        if (is_null(static::$preprocessedMeta) && $fields = Config::get('popcode-usercrud.meta_fields')) {
+            $keyArray = [];
+            foreach ($fields as $field) {
+                $keyArray[$field] = null;
+            }
+            static::$preprocessedMeta = $keyArray;
+        }
+        return $this;
+    }
+
     /**
      * @param mixed $data
      * @param string $type
@@ -146,13 +151,12 @@ class User extends Authenticatable
      * @return \Illuminate\Validation\Validator
      */
     public function validate($data, $type = null) {
-        if (is_null($type) || !property_exists(static::class, 'validationRules' . ucfirst($type))) {
-            return Validator::make($data, static::$validationRules, []);
+        $rules = Config::get('popcode-usercrud.validation_rules.default', []);
+        if ($type) {
+            $rules = array_merge($rules, Config::get('popcode-usercrud.validation_rules.' . $type, []));
         }
 
-        $property = 'validationRules' . ucfirst($type);
-
-        return Validator::make($data, static::$$property);
+        return Validator::make($data, $rules);
     }
 
     public static function registerRestoreGuard() {
@@ -160,5 +164,25 @@ class User extends Authenticatable
             $email = substr($user->email, 0, strpos($user->email, '#'));
             return static::where('email', '=', $email)->count() === 0;
         });
+    }
+
+
+    public function setPasswordAttribute($password) {
+        $this->attributes['password'] = \Hash::make($password);
+    }
+
+    public function toArray() {
+        $array = parent::toArray();
+
+        if (isset($array['meta']) && is_array($array['meta'])) {
+            $preprocessed = static::$preprocessedMeta;
+            foreach ($array['meta'] as $meta) {
+                $preprocessed[$meta['key']] = $meta['value'];
+            };
+
+            $array['meta'] = $preprocessed;
+        }
+
+        return $array;
     }
 }
