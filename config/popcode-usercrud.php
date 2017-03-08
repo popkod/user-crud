@@ -19,10 +19,11 @@ return [
     'validation_rules' => [
         'default' => [
             'name' => 'string|max:250',
-            'email' => 'required|unique:users',
+            'email' => 'required',
             'password' => 'confirmed',
         ],
         'store' => [
+            'email' => 'required|unique:users',
             'password' => 'required|confirmed',
         ],
     ],

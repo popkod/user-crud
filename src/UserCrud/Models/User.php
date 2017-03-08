@@ -74,7 +74,7 @@ class User extends Authenticatable
 
         return $query->update([
             $this->getDeletedAtColumn() => $this->fromDateTime($time),
-            $this->email                => $this->email . '#deleted-' . $this->id,
+            'email'                     => $this->email . '#deleted-' . $this->id,
         ]);
     }
 

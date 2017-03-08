@@ -85,9 +85,9 @@ class UserController extends BaseController implements UserControllerInterface
     public function update($id) {
         $data = \Request::all();
 
-        $errors = $this->hasError($data, 'store');
+        $errors = $this->hasError($data, 'update');
         if ($errors) {
-            return $this->errorResponseGenerator($data, $errors, 'store');
+            return $this->errorResponseGenerator($data, $errors, 'update');
         }
 
         $user = $this->updateUser($id, $data);
@@ -130,7 +130,9 @@ class UserController extends BaseController implements UserControllerInterface
         $user->save();
 
         if ($this->metaModel) {
-            (new UserMetaFactory($this->metaModel, $user->id))->create($userData['meta'])->save();
+            if (isset($userData['meta'])) {
+                (new UserMetaFactory($this->metaModel, $user->id))->create($userData['meta'])->save();
+            }
             $user->load('meta');
         }
 
@@ -146,7 +148,9 @@ class UserController extends BaseController implements UserControllerInterface
 
         if ($this->metaModel) {
             $user->meta()->delete();
-            (new UserMetaFactory($this->metaModel, $user->id))->create($userData['meta'])->save();
+            if (isset($userData['meta'])) {
+                (new UserMetaFactory($this->metaModel, $user->id))->create($userData['meta'])->save();
+            }
             $user->load('meta');
         }
 
