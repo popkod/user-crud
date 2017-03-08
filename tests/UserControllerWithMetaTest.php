@@ -29,7 +29,7 @@ class UserControllerWithMetaTest extends TestCase
 
         $this->user->mock
             ->shouldReceive('with')
-            ->withArgs(['metas'])
+            ->withArgs(['meta'])
             ->once()
             ->andReturnSelf();
 
@@ -183,10 +183,11 @@ class UserControllerWithMetaTest extends TestCase
     }
 
     public function testStore() {
+        $id = 1;
         $data = [
-            'id' => 1,
+            'id' => $id,
             'other_field' => 'other_value',
-            'metas' => [
+            'meta' => [
                 ['key' => 'meta-key', 'value' => 'meta-value'],
             ],
         ];
@@ -201,12 +202,16 @@ class UserControllerWithMetaTest extends TestCase
             ->once();
         $this->user->mock
             ->shouldReceive('load')
-            ->with('metas')
+            ->with('meta')
             ->once();
+
+        $this->user->mock
+            ->shouldReceive('getAttribute')
+            ->with('id')
+            ->andReturn($id);
 
         $this->metas->mock
             ->shouldReceive('newInstance')
-            ->with($data['metas'][0])
             ->once()
             ->andReturnSelf();
         $this->metas->mock
@@ -225,11 +230,12 @@ class UserControllerWithMetaTest extends TestCase
         $data = [
             'id' => $id,
             'other_field' => 'other_value',
-            'metas' => [
+            'meta' => [
                 ['key' => 'meta-key', 'value' => 'meta-value'],
             ],
         ];
 
+        // SELECT
         $this->user->mock
             ->shouldReceive('where')
             ->with('id', '=', $id)
@@ -240,10 +246,12 @@ class UserControllerWithMetaTest extends TestCase
             ->once()
             ->andReturnSelf();
 
+        // SELECT meta
         $this->user->mock
-            ->shouldReceive('metas')
+            ->shouldReceive('meta')
             ->andReturn($this->metas->mock);
 
+        // UPDATE
         $this->user->mock
             ->shouldReceive('fill')
             ->with($data)
@@ -252,22 +260,30 @@ class UserControllerWithMetaTest extends TestCase
             ->shouldReceive('save')
             ->once();
 
+        // DELETE old meta
         $this->metas->mock
             ->shouldReceive('delete')
             ->once();
 
+        // get user id for meta
+        $this->user->mock
+            ->shouldReceive('getAttribute')
+            ->with('id')
+            ->andReturn($id);
+
+        // INSERT new meta
         $this->metas->mock
             ->shouldReceive('newInstance')
-            ->with($data['metas'][0])
             ->once()
             ->andReturnSelf();
         $this->metas->mock
             ->shouldReceive('save')
             ->once();
 
+        // SELECT new meta
         $this->user->mock
             ->shouldReceive('load')
-            ->with('metas')
+            ->with('meta')
             ->once();
 
         $controller = new UserController($this->user->mock, $this->metas->mock);
