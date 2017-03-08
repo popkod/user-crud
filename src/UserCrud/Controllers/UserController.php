@@ -99,7 +99,7 @@ class UserController extends BaseController implements UserControllerInterface
         $succeed = $this->destroyUser($id);
 
         if ($succeed) {
-            return $this->responseGenerator([], 'destroy');
+            return $this->responseGenerator(null, 'destroy');
         }
         return $this->errorResponseGenerator(['id' => $id], [], 'destroy');
     }
@@ -191,20 +191,28 @@ class UserController extends BaseController implements UserControllerInterface
 
 
     protected function responseGenerator($responseData, $type = null) {
-        if (\Request::ajax() || \Request::wantsJson()) {
-            return response()->json($responseData);
+        if (is_null($responseData)) {
+            return null;
         }
 
-        // TODO return view by type
-        return $responseData;
+        return response()->json($responseData);
+
+//        if (\Request::ajax() || \Request::wantsJson()) {
+//            return response()->json($responseData);
+//        }
+//
+//        // TODO return view by type
+//        return $responseData;
     }
 
     protected function errorResponseGenerator($data, $messages, $type = null, $status = 400) {
-        if (\Request::ajax() || \Request::wantsJson()) {
-            return response()->json(['error' => $messages], $status);
-        }
+        return response()->json(['error' => $messages], $status);
 
-        // TODO return view by type
-        return $messages;
+//        if (\Request::ajax() || \Request::wantsJson()) {
+//            return response()->json(['error' => $messages], $status);
+//        }
+//
+//        // TODO return view by type
+//        return $messages;
     }
 }

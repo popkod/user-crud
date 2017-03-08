@@ -19,17 +19,25 @@ return [
     'validation_rules' => [
         'default' => [
             'name' => 'string|max:250',
-            'email' => 'required',
+            'email' => 'required|email',
             'password' => 'confirmed',
         ],
         'store' => [
-            'email' => 'required|unique:users',
+            'email' => 'required|email|unique:users',
             'password' => 'required|confirmed',
         ],
     ],
     'roles' => [
-        'registered' => 1,
-        'admin'      => 2,
+        1 => [
+            'id' => 1,
+            'label' => 'registered',
+            'title' => 'Registered',
+        ],
+        2 => [
+            'id' => 2,
+            'label' => 'admin',
+            'title' => 'Administrator',
+        ],
     ],
     'default_admin' => [
         'name'     => 'Default Admin',

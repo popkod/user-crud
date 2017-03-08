@@ -183,6 +183,12 @@ class User extends Authenticatable
             $array['meta'] = $preprocessed;
         }
 
+        if (!isset($array['role'])) {
+            $array['role'] = 1;
+        }
+
+        $array['role_obj'] = Config::get('popcode-usercrud.roles.' . $array['role']);
+
         return $array;
     }
 }
