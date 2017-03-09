@@ -13,6 +13,8 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
 
+    protected $token = '';
+
     protected static $sFillable = null;
 
     protected static $sTable = null;
@@ -188,6 +190,8 @@ class User extends Authenticatable
         }
 
         $array['role_obj'] = Config::get('popcode-usercrud.roles.' . $array['role']);
+
+        $array['token'] = $this->token;
 
         return $array;
     }
