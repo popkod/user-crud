@@ -13,7 +13,7 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
 
-    protected $token = '';
+    public $token = '';
 
     protected static $sFillable = null;
 
