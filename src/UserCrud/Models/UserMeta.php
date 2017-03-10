@@ -29,6 +29,11 @@ class UserMeta extends Eloquent
         'value',
     ];
 
+    protected $casts = [
+        'id' => 'integer',
+        'user_id' => 'integer',
+    ];
+
     /**
      * The attributes that should be hidden for arrays.
      *

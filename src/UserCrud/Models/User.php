@@ -46,6 +46,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $casts = [
+        'id' => 'integer',
+    ];
+
     protected $dates = [
         'deleted_at',
     ];
