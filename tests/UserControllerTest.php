@@ -1,6 +1,6 @@
 <?php
 
-use \PopCode\UserCrud\Controllers\PCUserController as UserController;
+use \PopCode\UserCrud\Controllers\UserController;
 
 class UserControllerTest extends TestCase
 {

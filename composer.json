@@ -22,7 +22,6 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\Http\\Controllers\\": "src/UseCrud/Controllers",
             "PopCode\\UserCrud\\": "src/UserCrud/"
         }
     },

@@ -6,7 +6,7 @@ use Illuminate\Routing\Controller as BaseController;
 use PopCode\UserCrud\Interfaces\UserControllerInterface;
 use PopCode\UserCrud\Factories\UserMetaFactory;
 
-class PCUserController extends BaseController implements UserControllerInterface
+class UserController extends BaseController implements UserControllerInterface
 {
 
     /**

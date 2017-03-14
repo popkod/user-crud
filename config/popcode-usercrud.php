@@ -10,7 +10,7 @@ return [
     'model' => PopCode\UserCrud\Models\User::class,
     'meta_table' => 'user_metas',
     'meta_model' => PopCode\UserCrud\Models\UserMeta::class,
-    'controller' => PopCode\UserCrud\Controllers\PCUserController::class,
+    'controller' => PopCode\UserCrud\Controllers\UserController::class,
     'fillable' => [
         'name',
         'email',
@@ -49,7 +49,7 @@ return [
         ['key' => 'created_by', 'value' => 'Core System'],
     ],
 
-    'role_controller' => PopCode\UserCrud\Controllers\PCRoleController::class,
+    'role_controller' => PopCode\UserCrud\Controllers\RoleController::class,
 
     // string[] list of fields that always needs to be listed
     'meta_fields' => [],
