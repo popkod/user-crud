@@ -20,7 +20,7 @@ class CreateUserMetaTable extends Migration
                 $table->increments('id');
                 $table->integer('user_id', false, true)->nullable();
                 $table->string('key')->default('');
-                $table->text('value')->default('');
+                $table->text('value')->nullable();
                 $table->timestamps();
 
                 $table->foreign('user_id')->references('id')->on(Config::get('popcode-usercrud.table', 'users'));
