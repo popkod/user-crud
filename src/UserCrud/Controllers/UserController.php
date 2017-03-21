@@ -146,6 +146,9 @@ class UserController extends BaseController implements UserControllerInterface
         /* @var \PopCode\UserCrud\Models\User $user */
         $user = $this->model->where('id', '=', $id)->first();
 
+        if (class_exists('\\Hash') && isset($userData['password'])) {
+            $userData['password'] = \Hash::make($userData['password']);
+        }
         $user->fill($userData);
         $user->save();
 
