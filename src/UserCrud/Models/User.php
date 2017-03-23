@@ -185,11 +185,13 @@ class User extends Authenticatable
             $array['meta'] = $preprocessed;
         }
 
-        if (!isset($array['role'])) {
-            $array['role'] = 1;
-        }
+        if (Config::get('popcode-usercrud.append_static_role', false)) {
+            if (!isset($array['role'])) {
+                $array['role'] = 1;
+            }
 
-        $array['role_obj'] = Config::get('popcode-usercrud.roles.' . $array['role']);
+            $array['role_obj'] = Config::get('popcode-usercrud.roles.' . $array['role']);
+        }
 
         $array['token'] = $this->token;
 
