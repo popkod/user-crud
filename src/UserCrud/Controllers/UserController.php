@@ -170,10 +170,14 @@ class UserController extends BaseController implements UserControllerInterface
     }
 
 
-    protected function hasError($userData, $type = null) {
+    protected function hasError($userData, $type = null, \Closure $after = null) {
         $errorMessages = [];
 
         $validator = $this->model->validate($userData, $type);
+
+        if ($after instanceof \Closure) {
+            $validator->after($after);
+        }
 
         if ($validator->fails()) {
             $errorMessages = $validator->messages()->toArray();

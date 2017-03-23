@@ -157,12 +157,7 @@ class User extends Authenticatable
      * @return \Illuminate\Validation\Validator
      */
     public function validate($data, $type = null) {
-        $rules = Config::get('popcode-usercrud.validation_rules.default', []);
-        if ($type) {
-            $rules = array_merge($rules, Config::get('popcode-usercrud.validation_rules.' . $type, []));
-        }
-
-        return Validator::make($data, $rules);
+        return Validator::make($data, $this->getRules($type));
     }
 
     public static function registerRestoreGuard() {
@@ -196,5 +191,13 @@ class User extends Authenticatable
         $array['token'] = $this->token;
 
         return $array;
+    }
+
+    protected function getRules($type) {
+        $rules = Config::get('popcode-usercrud.validation_rules.default', []);
+        if ($type) {
+            $rules = array_merge($rules, Config::get('popcode-usercrud.validation_rules.' . $type, []));
+        }
+        return $rules;
     }
 }
