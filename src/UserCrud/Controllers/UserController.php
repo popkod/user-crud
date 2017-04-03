@@ -152,7 +152,7 @@ class UserController extends BaseController implements UserControllerInterface
         $user->fill($userData);
         $user->save();
 
-        if ($this->metaModel) {
+        if ($this->metaModel && array_key_exists('meta', $userData)) {
             $user->meta()->delete();
             if (isset($userData['meta'])) {
                 (new UserMetaFactory($this->metaModel, $user->id))->create($userData['meta'])->save();
